@@ -1,0 +1,769 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  
+  /* Meditation App Color Palette */
+  --background: #f8fafb;
+  --foreground: #2d3748;
+  --card: #ffffff;
+  --card-foreground: #2d3748;
+  --popover: #ffffff;
+  --popover-foreground: #2d3748;
+  --primary: #667eea;
+  --primary-foreground: #ffffff;
+  --secondary: #f7fafc;
+  --secondary-foreground: #4a5568;
+  --muted: #f7fafc;
+  --muted-foreground: #718096;
+  --accent: #e6fffa;
+  --accent-foreground: #234e52;
+  --destructive: #e53e3e;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #ffffff;
+  --input-background: #ffffff;
+  --ring: #667eea;
+  
+  /* Meditation-inspired accent colors */
+  --calm-blue: #667eea;
+  --peaceful-green: #48bb78;
+  --sunset-orange: #ed8936;
+  --lavender: #9f7aea;
+  --ocean-teal: #38b2ac;
+  --soft-pink: #ed64a6;
+  
+  /* Typography weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Gentle rounded corners */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  
+  /* Sidebar styling */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #2d3748;
+  --sidebar-primary: #667eea;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f7fafc;
+  --sidebar-accent-foreground: #4a5568;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #667eea;
+  
+  /* Breathing animation timing */
+  --breathe-duration: 6s;
+  --breathe-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --gentle-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --wave-duration: 4s;
+  --click-ease: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* Light mode gradient */
+  --gradient-bg: linear-gradient(135deg, #f8fafb 0%, #e6fffa 100%);
+}
+
+.dark {
+  /* Dark mode for meditation */
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --card: #1e293b;
+  --card-foreground: #f1f5f9;
+  --popover: #1e293b;
+  --popover-foreground: #f1f5f9;
+  --primary: #818cf8;
+  --primary-foreground: #0f172a;
+  --secondary: #334155;
+  --secondary-foreground: #e2e8f0;
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #e6fffa;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #334155;
+  --input: #1e293b;
+  --input-background: #1e293b;
+  --ring: #818cf8;
+  
+  --sidebar: #1e293b;
+  --sidebar-foreground: #f1f5f9;
+  --sidebar-primary: #818cf8;
+  --sidebar-primary-foreground: #0f172a;
+  --sidebar-accent: #334155;
+  --sidebar-accent-foreground: #e2e8f0;
+  --sidebar-border: #334155;
+  --sidebar-ring: #818cf8;
+
+  /* Dark mode gradient */
+  --gradient-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-ring: var(--ring);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  
+  /* Custom meditation colors */
+  --color-calm-blue: var(--calm-blue);
+  --color-peaceful-green: var(--peaceful-green);
+  --color-sunset-orange: var(--sunset-orange);
+  --color-lavender: var(--lavender);
+  --color-ocean-teal: var(--ocean-teal);
+  --color-soft-pink: var(--soft-pink);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    outline: none;
+  }
+
+  html {
+    font-size: var(--font-size);
+    background: var(--background);
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", "Roboto", "Inter", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--gradient-bg);
+    min-height: 100vh;
+    transition: background-color 0.3s var(--gentle-ease);
+  }
+}
+
+/**
+ * Gentle Typography System
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-size: 2.5rem;
+      font-weight: var(--font-weight-light);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin: 0;
+      color: var(--foreground);
+    }
+
+    h2 {
+      font-size: 2rem;
+      font-weight: var(--font-weight-light);
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      margin: 0;
+      color: var(--foreground);
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: var(--font-weight-medium);
+      line-height: 1.4;
+      margin: 0;
+      color: var(--foreground);
+    }
+
+    h4 {
+      font-size: 1.25rem;
+      font-weight: var(--font-weight-medium);
+      line-height: 1.4;
+      margin: 0;
+      color: var(--foreground);
+    }
+
+    p {
+      font-size: 1rem;
+      font-weight: var(--font-weight-normal);
+      line-height: 1.7;
+      margin: 0;
+      color: var(--foreground);
+    }
+
+    label {
+      font-size: 0.875rem;
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+      margin: 0;
+      color: var(--muted-foreground);
+    }
+
+    button {
+      font-size: 0.875rem;
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    input, textarea {
+      font-size: 1rem;
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+      margin: 0;
+    }
+  }
+}
+
+/**
+ * Meditation & Breathwork Animations
+ */
+@keyframes gentle-breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+}
+
+@keyframes calm-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 40px rgba(102, 126, 234, 0);
+  }
+}
+
+@keyframes meditation-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(102, 126, 234, 0.3);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes breathing-waves {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.1;
+  }
+  50% {
+    transform: scale(1.8);
+    opacity: 0.05;
+  }
+  90% {
+    opacity: 0;
+  }
+}
+
+@keyframes subtle-expansion {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.08;
+  }
+  50% {
+    transform: scale(2.2);
+    opacity: 0.03;
+  }
+  85% {
+    opacity: 0;
+  }
+}
+
+@keyframes gentle-ripple {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.12;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.06;
+  }
+  80% {
+    opacity: 0;
+  }
+}
+
+@keyframes satisfying-click {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes ripple-effect {
+  0% {
+    transform: scale(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes timer-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+}
+
+.animate-gentle-breathe {
+  animation: gentle-breathe var(--breathe-duration) var(--gentle-ease) infinite;
+}
+
+.animate-calm-pulse {
+  animation: calm-pulse 4s ease-in-out infinite;
+}
+
+.animate-meditation-glow {
+  animation: meditation-glow 3s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+.animate-breathing-waves {
+  animation: breathing-waves var(--wave-duration) ease-out infinite;
+}
+
+.animate-subtle-expansion {
+  animation: subtle-expansion calc(var(--wave-duration) * 1.2) ease-out infinite;
+}
+
+.animate-gentle-ripple {
+  animation: gentle-ripple calc(var(--wave-duration) * 0.8) ease-out infinite;
+}
+
+.animate-satisfying-click {
+  animation: satisfying-click 0.2s var(--click-ease);
+}
+
+.animate-timer-pulse {
+  animation: timer-pulse 2s ease-in-out infinite;
+}
+
+/**
+ * Calm UI Components
+ */
+.calm-button {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--lavender) 100%);
+  color: var(--primary-foreground);
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: var(--radius-xl);
+  font-weight: var(--font-weight-medium);
+  transition: all 0.3s var(--gentle-ease);
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+}
+
+.calm-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+}
+
+.calm-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+}
+
+.zen-card {
+  background: var(--card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all 0.3s var(--gentle-ease);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.dark .zen-card {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+.zen-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+}
+
+.meditation-input {
+  background: var(--input-background);
+  backdrop-filter: blur(10px);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 1rem 1.5rem;
+  transition: all 0.3s var(--gentle-ease);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.dark .meditation-input {
+  background: rgba(30, 41, 59, 0.9);
+}
+
+.meditation-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  background: var(--input-background);
+}
+
+/**
+ * Enhanced Breathing Circle Styles with Click Effects
+ */
+.breathing-circle {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--calm-blue) 0%, var(--ocean-teal) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s var(--gentle-ease);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.breathing-circle::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+  transition: all 0.3s var(--gentle-ease);
+  z-index: 1;
+}
+
+.breathing-circle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 16px 48px rgba(102, 126, 234, 0.3);
+}
+
+.breathing-circle:active {
+  transform: scale(0.98);
+}
+
+.breathing-circle.recording {
+  background: linear-gradient(135deg, var(--sunset-orange) 0%, var(--soft-pink) 100%);
+  animation: meditation-glow 2s ease-in-out infinite;
+}
+
+.breathing-circle.clicking {
+  animation: satisfying-click 0.2s var(--click-ease);
+}
+
+/* Ripple effect for button clicks */
+.breathing-circle .ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  animation: ripple-effect 0.6s ease-out;
+  z-index: 2;
+}
+
+/**
+ * Recording Timer Styles
+ */
+.recording-timer {
+  background: rgba(237, 133, 54, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(237, 133, 54, 0.3);
+  border-radius: var(--radius-xl);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s var(--gentle-ease);
+}
+
+.dark .recording-timer {
+  background: rgba(237, 133, 54, 0.15);
+  border: 1px solid rgba(237, 133, 54, 0.4);
+}
+
+.recording-timer .timer-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--sunset-orange);
+  animation: timer-pulse 1s ease-in-out infinite;
+}
+
+.recording-timer .timer-text {
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.05em;
+  color: var(--sunset-orange);
+}
+
+/**
+ * Breathing Wave Container
+ */
+.breathing-wave-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.breathing-wave {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(102, 126, 234, 0.15);
+  pointer-events: none;
+}
+
+.breathing-wave.wave-1 {
+  width: 240px;
+  height: 240px;
+  border-color: rgba(237, 133, 54, 0.2);
+}
+
+.breathing-wave.wave-2 {
+  width: 300px;
+  height: 300px;
+  border-color: rgba(237, 100, 166, 0.15);
+  animation-delay: 1s;
+}
+
+.breathing-wave.wave-3 {
+  width: 360px;
+  height: 360px;
+  border-color: rgba(102, 126, 234, 0.1);
+  animation-delay: 2s;
+}
+
+.breathing-wave.recording.wave-1 {
+  border-color: rgba(237, 133, 54, 0.25);
+}
+
+.breathing-wave.recording.wave-2 {
+  border-color: rgba(237, 100, 166, 0.2);
+}
+
+.breathing-wave.recording.wave-3 {
+  border-color: rgba(56, 178, 172, 0.15);
+}
+
+/**
+ * Glass morphism effects - Updated for theme support
+ */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass {
+  background: rgba(30, 41, 59, 0.3);
+  border: 1px solid rgba(51, 65, 85, 0.3);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .glass-strong {
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+/**
+ * Zen Spacing System
+ */
+.space-zen-xs { margin: 0.5rem; }
+.space-zen-sm { margin: 1rem; }
+.space-zen-md { margin: 1.5rem; }
+.space-zen-lg { margin: 2.5rem; }
+.space-zen-xl { margin: 4rem; }
+.space-zen-2xl { margin: 6rem; }
+
+.gap-zen-xs { gap: 0.5rem; }
+.gap-zen-sm { gap: 1rem; }
+.gap-zen-md { gap: 1.5rem; }
+.gap-zen-lg { gap: 2.5rem; }
+.gap-zen-xl { gap: 4rem; }
+
+/**
+ * Meditation Focus States
+ */
+.meditation-focus {
+  position: relative;
+  transition: all 0.3s var(--gentle-ease);
+}
+
+.meditation-focus::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: linear-gradient(135deg, var(--calm-blue), var(--ocean-teal), var(--peaceful-green));
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s var(--gentle-ease);
+}
+
+.meditation-focus:hover::after,
+.meditation-focus:focus::after {
+  opacity: 0.1;
+}
+
+/**
+ * Gradient Backgrounds
+ */
+.gradient-calm {
+  background: linear-gradient(135deg, var(--calm-blue) 0%, var(--ocean-teal) 100%);
+}
+
+.gradient-peaceful {
+  background: linear-gradient(135deg, var(--peaceful-green) 0%, var(--ocean-teal) 100%);
+}
+
+.gradient-sunset {
+  background: linear-gradient(135deg, var(--sunset-orange) 0%, var(--soft-pink) 100%);
+}
+
+.gradient-lavender {
+  background: linear-gradient(135deg, var(--lavender) 0%, var(--soft-pink) 100%);
+}
+
+/**
+ * Utility classes
+ */
+.text-gentle {
+  font-weight: var(--font-weight-light);
+  color: var(--muted-foreground);
+}
+
+.shadow-soft {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.dark .shadow-soft {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.shadow-gentle {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.dark .shadow-gentle {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/**
+ * Selection styling
+ */
+::selection {
+  background: rgba(102, 126, 234, 0.2);
+  color: var(--foreground);
+}
+
+::-moz-selection {
+  background: rgba(102, 126, 234, 0.2);
+  color: var(--foreground);
+}
+
+/**
+ * Scrollbar styling
+ */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: var(--radius-sm);
+  transition: all 0.3s var(--gentle-ease);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ocean-teal);
+}
