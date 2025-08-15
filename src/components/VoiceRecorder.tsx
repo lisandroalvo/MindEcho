@@ -6,41 +6,9 @@ interface VoiceRecorderProps {
   onNewNote: (note: Note) => void;
 }
 
-interface SpeechRecognitionErrorEvent extends Event {
-  error: string;
-}
-
-interface SpeechRecognitionResult {
-  isFinal: boolean;
-  item(index: number): {
-    transcript: string;
-  };
-}
-
-interface SpeechRecognitionResultList {
-  item(index: number): SpeechRecognitionResult;
-  length: number;
-}
-
-interface SpeechRecognitionEvent extends Event {
-  results: SpeechRecognitionResultList;
-}
-
-interface SpeechRecognition extends EventTarget {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start(): void;
-  stop(): void;
-  onresult: ((event: SpeechRecognitionEvent) => void) | null;
-  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
-  onend: (() => void) | null;
-}
-
 declare global {
   interface Window {
-    SpeechRecognition: new () => SpeechRecognition;
-    webkitSpeechRecognition: new () => SpeechRecognition;
+    webkitSpeechRecognition: new () => any;
   }
 }
 
@@ -48,206 +16,128 @@ export function VoiceRecorder({ onNewNote }: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
+  // Initialize speech recognition
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+    recognition.lang = 'en-US';
 
-    const initializeSpeechRecognition = () => {
-      try {
-        // Check for browser support
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-          throw new Error('Speech recognition is not supported in this browser');
-        }
+    recognition.onstart = () => {
+      console.log('Started recording');
+    };
 
-        // Create and configure recognition instance
-        const recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = 'en-US'; // Set language explicitly
+    recognition.onresult = (event: any) => {
+      const results = event.results;
+      const lastResult = results[results.length - 1];
+      const transcript = lastResult[0].transcript;
+      console.log('Got transcript:', transcript);
+      setTranscript(transcript);
+    };
 
-        // Handle results
-        recognition.onresult = (event: SpeechRecognitionEvent) => {
-          let finalTranscript = '';
-          for (let i = 0; i < event.results.length; i++) {
-            const result = event.results.item(i);
-            if (result.isFinal) {
-              finalTranscript += result.item(0).transcript;
-            }
-          }
-          if (finalTranscript) {
-            setTranscript(finalTranscript);
-          }
-        };
+    recognition.onerror = (event: any) => {
+      console.error('Recognition error:', event.error);
+      toast.error('Recognition error - please try again');
+    };
 
-        // Handle errors
-        recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-          console.error('Speech recognition error:', event.error);
-          let errorMessage = 'Speech recognition error';
-          
-          switch (event.error) {
-            case 'network':
-              errorMessage = 'Network error occurred. Please check your connection.';
-              break;
-            case 'not-allowed':
-            case 'permission-denied':
-              errorMessage = 'Microphone permission is required.';
-              break;
-            case 'no-speech':
-              errorMessage = 'No speech was detected.';
-              break;
-            case 'audio-capture':
-              errorMessage = 'No microphone was found or microphone is disabled.';
-              break;
-            default:
-              errorMessage = `Speech recognition error: ${event.error}`;
-          }
-          
-          setError(errorMessage);
-          toast.error(errorMessage);
-          stopRecording();
-        };
-
-        // Handle recognition end
-        recognition.onend = () => {
-          console.log('Speech recognition ended');
-          if (isRecording) {
-            console.log('Restarting speech recognition...');
-            recognition.start();
-          }
-        };
-
-        // Store the recognition instance
-        recognitionRef.current = recognition;
-      } catch (error) {
-        console.error('Error initializing speech recognition:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Failed to initialize speech recognition';
-        setError(errorMessage);
-        toast.error(errorMessage);
+    recognition.onend = () => {
+      if (isRecording) {
+        recognition.start();
       }
     };
 
-    initializeSpeechRecognition();
+    recognitionRef.current = recognition;
 
     return () => {
-      if (isRecording) {
-        stopRecording();
-      }
       if (recognitionRef.current) {
-        recognitionRef.current.onend = null;
-        recognitionRef.current.onresult = null;
-        recognitionRef.current.onerror = null;
+        recognitionRef.current.stop();
       }
     };
   }, [isRecording]);
 
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+    }
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (err) {}
+    }
+    setIsRecording(false);
+  };
+
   const startRecording = async () => {
     try {
       setError(null);
-      
-      // Request microphone permission first
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
-        } 
-      });
-
-      // Initialize MediaRecorder with optimal settings
-      const options = {
-        mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-          ? 'audio/webm;codecs=opus'
-          : 'audio/webm'
-      };
-
-      mediaRecorderRef.current = new MediaRecorder(stream, options);
+      setTranscript('');
       chunksRef.current = [];
 
-      // Handle incoming audio data
-      mediaRecorderRef.current.ondataavailable = (event) => {
+      // Get microphone access
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true
+      });
+
+      // Set up media recorder
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunksRef.current.push(event.data);
         }
       };
 
-      // Handle recording stop
-      mediaRecorderRef.current.onstop = () => {
-        if (chunksRef.current.length === 0) {
-          toast.error('No audio data was recorded');
-          return;
-        }
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const audioUrl = URL.createObjectURL(audioBlob);
 
-        try {
-          const audioBlob = new Blob(chunksRef.current, { type: options.mimeType });
-          const audioUrl = URL.createObjectURL(audioBlob);
-          
-          const newNote: Note = {
-            id: Date.now().toString(),
-            text: transcript || 'Untitled Note',
-            timestamp: Date.now(),
-            audioUrl
-          };
+        const newNote: Note = {
+          id: Date.now().toString(),
+          text: transcript || 'Untitled Note',
+          timestamp: Date.now(),
+          audioUrl: audioUrl,
+        };
 
-          onNewNote(newNote);
-          setTranscript('');
-          toast.success('Note saved successfully');
-        } catch (error) {
-          console.error('Error creating audio blob:', error);
-          toast.error('Error saving audio recording');
-        }
+        onNewNote(newNote);
+        setTranscript('');
+        setIsRecording(false);
+
+        // Clean up
+        stream.getTracks().forEach(track => track.stop());
       };
 
-      // Handle MediaRecorder errors
-      mediaRecorderRef.current.onerror = (event) => {
-        console.error('MediaRecorder error:', event);
-        setError('Error recording audio');
-        toast.error('Error recording audio');
-        stopRecording();
-      };
-
-      // Start both audio and speech recognition
-      mediaRecorderRef.current.start(1000); // Collect data every second
-      
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.start();
-        } catch (error) {
-          console.error('Error starting speech recognition:', error);
-          // Continue with audio recording even if speech recognition fails
-          toast.warning('Speech-to-text may not work, but audio recording will continue');
-        }
-      }
-
+      // Start recording
+      mediaRecorder.start(1000);
+      recognitionRef.current?.start();
       setIsRecording(true);
-      toast.info('Recording started');
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      const errorMessage = error instanceof Error 
-        ? error.message
-        : 'Failed to start recording. Please check microphone permissions.';
-      setError(errorMessage);
-      toast.error(errorMessage);
-    }
-  };
-
-  const stopRecording = () => {
-    try {
-      if (mediaRecorderRef.current?.state === 'recording') {
-        mediaRecorderRef.current.stop();
-      }
-      recognitionRef.current?.stop();
+    } catch (error: any) {
+      console.error('Recording error:', error);
+      setError(error.message || 'Failed to start recording');
+      toast.error(error.message || 'Failed to start recording');
       setIsRecording(false);
 
-      // Stop all audio tracks
-      mediaRecorderRef.current?.stream.getTracks().forEach(track => track.stop());
-    } catch (error) {
-      console.error('Error stopping recording:', error);
-      setError(error instanceof Error ? error.message : 'Failed to stop recording');
-      toast.error('Failed to stop recording');
+      // Clean up any partial setup
+      if (mediaRecorderRef.current) {
+        try {
+          mediaRecorderRef.current.stop();
+        } catch (e) {
+          console.error('Error stopping recorder:', e);
+        }
+      }
+
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          console.error('Error stopping recognition:', e);
+        }
+      }
     }
   };
 
